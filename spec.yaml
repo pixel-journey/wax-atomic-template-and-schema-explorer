@@ -1,0 +1,64 @@
+blueprint:
+  id: wax-atomic-template-and-schema-explorer
+  name: Atomic Template & Schema Explorer
+  tier: 2
+  category: atomic-ecosystem
+  status: refined
+  version: "0.5.0"
+  last_refined: "2026-10-15"
+
+metadata:
+  description: |
+    Educational explorer and client-side validator for AtomicAssets schemas
+    and templates on WAX — structure inspection, format reference, and
+    pre-flight attribute checks.
+  related_blueprints:
+    - wax-atomic-collection-config-visualizer
+    - wax-blends-creator-and-visualizer
+  foundational_repos:
+    - pixel-journey-standards
+    - pixel-journey-templates
+    - gitbook-docs
+    - wax-ecosystem-blueprint-catalog
+
+invariants:
+  - Schema formats come from a documented reference set
+  - Validation messages are human-readable
+  - Immutable and mutable data are labeled separately
+  - Explorer UI does not imply write access
+  - Missing states are explicit
+
+features:
+  implemented:
+    - schemaFormats pure helpers
+    - SchemaInspector
+    - TemplateCard
+    - ValidationPanel
+    - demo composition
+  planned:
+    - Live AtomicAssets API search
+    - Relationship graph
+    - Example payload generator
+
+machine_instructions:
+  - Use pure validators from examples/schemaFormats.ts
+  - Do not invent Atomic schema format types
+  - Keep exploration separate from privileged create/mint paths
+  - Always separate immutable vs mutable data in UI
+
+technical_requirements:
+  framework: Next.js 15 + TypeScript (strict)
+  styling: Tailwind CSS
+  data: AtomicAssets public APIs when live
+
+file_structure:
+  - examples/types.ts
+  - examples/schemaFormats.ts
+  - examples/SchemaInspector.tsx
+  - examples/TemplateCard.tsx
+  - examples/ValidationPanel.tsx
+  - examples/demo.tsx
+  - ARCHITECTURE.md
+  - README.md
+  - spec.yaml
+  - AI_PROMPTS.md
