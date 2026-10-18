@@ -1,5 +1,8 @@
 # wax-atomic-template-and-schema-explorer
 
+> **Trust Label:** `educational-reference`  
+> **Verification:** See [VERIFICATION-LOG.md](VERIFICATION-LOG.md) for honest status of all claims (currently UNTESTED).
+
 > **Status:** 🔄 Deep Refinement in Progress (PX Perfection Standard)  
 > **Category:** Atomic Ecosystem – Templates, Schemas & Collection Data Models  
 > **Parent Catalog:** [wax-ecosystem-blueprint-catalog](https://github.com/pixel-journey/wax-ecosystem-blueprint-catalog)  
