@@ -1,5 +1,7 @@
 # wax-atomic-template-and-schema-explorer
 
+> **v2:** `setschematyp` replaces the whole descriptor array. A template cannot be both non-transferable and non-burnable. `tokens_to_back` is rejected. See [V2-NOTES.md](./V2-NOTES.md).
+
 > **Trust Label:** `educational-reference`  
 > **Verification:** See [VERIFICATION-LOG.md](VERIFICATION-LOG.md) for honest status of all claims (currently UNTESTED).
 
