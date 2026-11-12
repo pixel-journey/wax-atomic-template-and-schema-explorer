@@ -59,7 +59,7 @@ function zigzag(value: number): number {
 
 export function previewAttributeBytes(input: {
   formatIndex: number;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "uint8[]" | "string[]";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "double" | "uint8[]" | "string[]";
   text?: string;
   number?: number;
   uint64?: string;
@@ -128,6 +128,13 @@ export function previewAttributeBytes(input: {
     const buf = Buffer.alloc(4);
     buf.writeFloatLE(input.number);
     body = [...buf];
+  } else if (input.kind === "double") {
+    if (input.number === undefined || !Number.isFinite(input.number)) {
+      return { ok: false, reason: "Expected a double, but got something else" };
+    }
+    const wide = Buffer.alloc(8);
+    wide.writeDoubleLE(input.number);
+    body = [...wide];
   } else if (input.kind === "uint8[]") {
     const list = input.list ?? [];
     if (list.some((item) => !Number.isInteger(item) || item < 0 || item > 255)) {
@@ -150,11 +157,11 @@ export function previewAttributeBytes(input: {
   return { ok: true, hex: Buffer.from([...ident, ...body]).toString("hex") };
 }
 
-const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "int16", "int32", "int64", "uint64", "ipfs", "float", "uint8[]", "string[]"]);
+const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "int16", "int32", "int64", "uint64", "ipfs", "float", "double", "uint8[]", "string[]"]);
 
 export type BlobValue = {
   name: string;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "uint8[]" | "string[]";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "double" | "uint8[]" | "string[]";
   text?: string;
   number?: number;
   uint64?: string;
