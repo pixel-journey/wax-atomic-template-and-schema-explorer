@@ -15,9 +15,13 @@ describe("attribute bytes", () => {
     expect(previewAttributeBytes({ formatIndex: 0, kind: "uint16", number: 65535 })).toEqual({ ok: true, hex: "04ffff03" });
     expect(previewAttributeBytes({ formatIndex: 0, kind: "int16", number: -2 })).toEqual({ ok: true, hex: "0403" });
     expect(previewAttributeBytes({ formatIndex: 0, kind: "int64", signed: "-2" })).toEqual({ ok: true, hex: "0403" });
-    expect(previewAttributeBytes({ formatIndex: 0, kind: "double", number: 1 })).toEqual({
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "int64[]", signeds: ["-2"] })).toEqual({
       ok: true,
-      hex: "04000000000000f03f",
+      hex: "040103",
+    });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "uint64[]", uints: ["128"] })).toEqual({
+      ok: true,
+      hex: "04018001",
     });
   });
 
