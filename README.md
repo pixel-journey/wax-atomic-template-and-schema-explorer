@@ -1,9 +1,15 @@
 # wax-atomic-template-and-schema-explorer
 
-> **v2:** `setschematyp` replaces the whole descriptor array. A template cannot be both non-transferable and non-burnable. `tokens_to_back` is rejected. See [V2-NOTES.md](./V2-NOTES.md).
+> **Home for schema and template rules.** `setschematyp` replaces the whole descriptor array. A template cannot be both non-transferable and non-burnable. `tokens_to_back` is rejected. The course is [EDUCATION.md](./EDUCATION.md). Related rules live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews) (author, RAM, offers) and [wax-atomic-collection-config-visualizer](https://github.com/pixel-journey/wax-atomic-collection-config-visualizer) (fee, auth lists). Do not open a new micro-repo for a single check that belongs here.
+
+**Official sources, still live:**
+- [How-To AtomicAssets](https://docs.wax.io/build/tutorials/howto_atomicassets)
+- [Managing AA Templates](https://docs.wax.io/build/tutorials/howto_atomicassets/templates_js)
+- [Minting atomicassets NFTs](https://docs.wax.io/build/tutorials/howto_atomicassets/mint_nft)
+- [atomicassets-contract v2.0.0](https://github.com/atomicassets/atomicassets-contract/releases/tag/v2.0.0)
 
 > **Trust Label:** `educational-reference`  
-> **Verification:** See [VERIFICATION-LOG.md](VERIFICATION-LOG.md) for honest status of all claims (currently UNTESTED).
+> **Verification:** The pure functions in `src/schemaRules.ts` are tested (`npm test`). The React explorer is not. See [VERIFICATION-LOG.md](VERIFICATION-LOG.md).
 
 > **Status:** 🔄 Deep Refinement in Progress (PX Perfection Standard)  
 > **Category:** Atomic Ecosystem – Templates, Schemas & Collection Data Models  
