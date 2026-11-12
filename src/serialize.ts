@@ -54,3 +54,48 @@ export function previewAttributeBytes(input: {
   }
   return { ok: true, hex: Buffer.from([...ident, ...body]).toString("hex") };
 }
+
+const PACKED = new Set(["string", "image", "bool", "uint8", "int8"]);
+
+export type BlobValue = {
+  name: string;
+  kind: "string" | "image" | "bool" | "uint8" | "int8";
+  text?: string;
+  number?: number;
+};
+
+export function previewDataBlob(
+  format: readonly { name: string; type: string }[],
+  values: readonly BlobValue[],
+): Bytes {
+  const byName = new Map(format.map((line, index) => [line.name, { ...line, index }]));
+  const used = new Set<string>();
+  const parts: Buffer[] = [];
+  for (const line of format) {
+    const value = values.find((item) => item.name === line.name);
+    if (!value) continue;
+    used.add(line.name);
+    if (!PACKED.has(line.type) || value.kind !== line.type) {
+      return { ok: false, reason: `this preview packs string, image, bool, uint8, and int8. ${line.type} is not packed here` };
+    }
+    const piece = previewAttributeBytes({
+      formatIndex: byName.get(line.name)?.index ?? 0,
+      kind: value.kind,
+      text: value.text,
+      number: value.number,
+    });
+    if (!piece.ok) return piece;
+    parts.push(Buffer.from(piece.hex, "hex"));
+  }
+  const leftover = values.map((value) => value.name).filter((name) => !used.has(name)).sort();
+  if (leftover[0]) {
+    return {
+      ok: false,
+      reason:
+        "The following attribute could not be serialized, because it is not specified in the provided format: " +
+        leftover[0],
+    };
+  }
+  return { ok: true, hex: Buffer.concat(parts).toString("hex") };
+}
+
