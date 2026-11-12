@@ -59,14 +59,13 @@ function zigzag(value: number): number {
 
 export function previewAttributeBytes(input: {
   formatIndex: number;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "uint64" | "ipfs" | "float" | "uint8[]";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "uint8[]" | "string[]";
   text?: string;
   number?: number;
   uint64?: string;
+  signed?: string;
   list?: number[];
-  text?: string;
-  number?: number;
-  uint64?: string;
+  texts?: string[];
 }): Bytes {
   if (input.formatIndex < 0) return { ok: false, reason: "format index must be the schema line, starting at 0" };
   const ident = varint(input.formatIndex + 4);
@@ -105,6 +104,16 @@ export function previewAttributeBytes(input: {
     const bits = input.kind === "int16" ? 16 : 32;
     const zigzagged = input.number < 0 ? BigInt(-1 * (input.number + 1)) * 2n + 1n : BigInt(input.number) * 2n;
     body = varintBig(zigzagged & ((1n << BigInt(bits)) - 1n));
+  } else if (input.kind === "int64") {
+    if (!/^-?(0|[1-9][0-9]{0,18})$/.test(input.signed ?? "")) {
+      return { ok: false, reason: "Expected a int64, but got something else" };
+    }
+    const value = BigInt(input.signed ?? "0");
+    if (value < -9223372036854775808n || value > 9223372036854775807n) {
+      return { ok: false, reason: "Expected a int64, but got something else" };
+    }
+    const zigzagged = value < 0n ? (-1n * (value + 1n)) * 2n + 1n : value * 2n;
+    body = varintBig(zigzagged);
   } else if (input.kind === "uint64") {
     if (!/^(0|[1-9][0-9]{0,19})$/.test(input.uint64 ?? "")) {
       return { ok: false, reason: "Expected a uint64, but got something else" };
@@ -126,6 +135,13 @@ export function previewAttributeBytes(input: {
     }
     body = [...varint(list.length)];
     for (const item of list) body.push(...varint(item & 0xff));
+  } else if (input.kind === "string[]") {
+    const texts = input.texts ?? [];
+    body = [...varint(texts.length)];
+    for (const text of texts) {
+      const bytes = Buffer.from(text, "utf8");
+      body.push(...varint(bytes.length), ...bytes);
+    }
   } else {
     const decoded = decodeBase58(input.text ?? "");
     if (!decoded) return { ok: false, reason: "Error when decoding IPFS string" };
@@ -134,15 +150,17 @@ export function previewAttributeBytes(input: {
   return { ok: true, hex: Buffer.from([...ident, ...body]).toString("hex") };
 }
 
-const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "int16", "int32", "uint64", "ipfs", "float", "uint8[]"]);
+const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "int16", "int32", "int64", "uint64", "ipfs", "float", "uint8[]", "string[]"]);
 
 export type BlobValue = {
   name: string;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "uint64" | "ipfs" | "float" | "uint8[]";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "uint8[]" | "string[]";
   text?: string;
   number?: number;
   uint64?: string;
+  signed?: string;
   list?: number[];
+  texts?: string[];
 };
 
 export function previewDataBlob(
@@ -166,6 +184,8 @@ export function previewDataBlob(
       number: value.number,
       uint64: value.uint64,
       list: value.list,
+      signed: value.signed,
+      texts: value.texts,
     });
     if (!piece.ok) return piece;
     parts.push(Buffer.from(piece.hex, "hex"));

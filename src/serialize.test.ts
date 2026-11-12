@@ -14,9 +14,10 @@ describe("attribute bytes", () => {
     expect(previewAttributeBytes({ formatIndex: 0, kind: "ipfs", text: "1" })).toEqual({ ok: true, hex: "040100" });
     expect(previewAttributeBytes({ formatIndex: 0, kind: "uint16", number: 65535 })).toEqual({ ok: true, hex: "04ffff03" });
     expect(previewAttributeBytes({ formatIndex: 0, kind: "int16", number: -2 })).toEqual({ ok: true, hex: "0403" });
-    expect(previewAttributeBytes({ formatIndex: 0, kind: "uint8[]", list: [1, 255] })).toEqual({
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "int64", signed: "-2" })).toEqual({ ok: true, hex: "0403" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "string[]", texts: ["a", "bb"] })).toEqual({
       ok: true,
-      hex: "040201ff01",
+      hex: "04020161026262",
     });
   });
 
