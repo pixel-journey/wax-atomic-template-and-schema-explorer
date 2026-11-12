@@ -87,6 +87,8 @@ The contract check is `burnable || transferable`. Both false is refused with the
 
 `previewAttributeValues` is the next step, from `include/atomicdata.hpp`. It does not emit bytes. A format line you omit is skipped. A key that is not in the format fails, and the name in the message is the alphabetically first leftover. `image` is a string. `ipfs` is a string in the base58 alphabet from `include/base58.hpp` (`0`, `O`, `I`, and `l` are not in it). A bool is a `uint8` that is 0 or 1. The contract string says `uin8_t`. A schema type of `bytes` passes `check_format` and then fails serialization: `No type could be matched - bytes`. The serializer matches `byte`, which `check_format` will not let you store.
 
+`previewAttributeBytes` emits one attribute. The first byte is `toVarintBytes(formatIndex + 4)`, so line 0 starts with `04`. A skipped earlier line still consumes its index: a value on line 2 starts with `06`. `Pixal` is `0405506978616c`. `uint8` 255 is `04ff01`, not a single `ff`. `int8` -1 is zigzagged to 1, so `0401`. This is not the whole data blob, and it was not checked on a node. RAM payer changes, including the `logrampayer` notification, live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews).
+
 Collection authorization is not checked. A successful preview is not a transaction.
 
 Pack opening and claim shapes are [wax-drops-and-pack-opening-experience](https://github.com/pixel-journey/wax-drops-and-pack-opening-experience). Holder cashback after backing was removed is [wax-nft-backed-token-unlock-visualizer](https://github.com/pixel-journey/wax-nft-backed-token-unlock-visualizer).
