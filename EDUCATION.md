@@ -83,6 +83,8 @@ The contract check is `burnable || transferable`. Both false is refused with the
 
 `previewCreateSchema` uses string length 1–12, not eosio name encoding. A taken name fails. `previewExtendSchema` must add at least one line. `previewSchemaFormat` is the v2 `check_format` rule: a `name`/`string` line is required, names are unique and at most 64 characters, and a type is one scalar plus at most one `[]`. The header comment says `byte`. The code accepts `bytes` and rejects `byte`. Nested vectors fail.
 
+`previewAttributeValues` is the next step, from `include/atomicdata.hpp`. It does not emit bytes. A format line you omit is skipped. A key that is not in the format fails, and the name in the message is the alphabetically first leftover. `image` is a string. `ipfs` is a string in the base58 alphabet from `include/base58.hpp` (`0`, `O`, `I`, and `l` are not in it). A bool is a `uint8` that is 0 or 1. The contract string says `uin8_t`. A schema type of `bytes` passes `check_format` and then fails serialization: `No type could be matched - bytes`. The serializer matches `byte`, which `check_format` will not let you store.
+
 Collection authorization is not checked. A successful preview is not a transaction.
 
 Pack opening and claim shapes are [wax-drops-and-pack-opening-experience](https://github.com/pixel-journey/wax-drops-and-pack-opening-experience). Holder cashback after backing was removed is [wax-nft-backed-token-unlock-visualizer](https://github.com/pixel-journey/wax-nft-backed-token-unlock-visualizer).
@@ -90,7 +92,7 @@ Pack opening and claim shapes are [wax-drops-and-pack-opening-experience](https:
 ## Masterclass — what the explorer does not do
 
 - It does not read `templates2`. Mutable template data is that table plus `settempldata`.
-- Attribute bytes are still not serialized. `previewSchemaFormat` checks the type names only. A value that does not fit `uint8` is not caught here.
+- Attribute bytes are still not emitted. `previewSchemaFormat` checks type names. `previewAttributeValues` checks that a value is the type the serializer expects. It does not return the byte string.
 - Transfer and burn of an already minted asset live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews).
 
 ### What this course will not teach
