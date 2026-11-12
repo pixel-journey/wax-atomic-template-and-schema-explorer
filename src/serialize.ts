@@ -59,7 +59,7 @@ function zigzag(value: number): number {
 
 export function previewAttributeBytes(input: {
   formatIndex: number;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "double" | "uint8[]" | "int64[]" | "uint64[]" | "string[]";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "double" | "uint8[]" | "int8[]" | "int16[]" | "uint16[]" | "uint32[]" | "int64[]" | "uint64[]" | "float[]" | "double[]" | "string[]";
   text?: string;
   number?: number;
   uint64?: string;
@@ -144,6 +144,36 @@ export function previewAttributeBytes(input: {
     }
     body = [...varint(list.length)];
     for (const item of list) body.push(...varint(item & 0xff));
+  } else if (input.kind === "int8[]" || input.kind === "int16[]" || input.kind === "uint16[]" || input.kind === "uint32[]") {
+    const list = input.list ?? [];
+    const spec = {
+      "int8[]": { min: -128, max: 127, bits: 8, signed: true },
+      "int16[]": { min: -32768, max: 32767, bits: 16, signed: true },
+      "uint16[]": { min: 0, max: 65535, bits: 16, signed: false },
+      "uint32[]": { min: 0, max: 4294967295, bits: 32, signed: false },
+    }[input.kind];
+    body = [...varint(list.length)];
+    for (const item of list) {
+      if (!Number.isInteger(item) || item < spec.min || item > spec.max) {
+        return { ok: false, reason: `Expected a ${input.kind.slice(0, -2)}, but got something else` };
+      }
+      const zigzagged = spec.signed
+        ? item < 0 ? BigInt(-1 * (item + 1)) * 2n + 1n : BigInt(item) * 2n
+        : BigInt(item);
+      body.push(...varintBig(zigzagged & ((1n << BigInt(spec.bits)) - 1n)));
+    }
+  } else if (input.kind === "float[]" || input.kind === "double[]") {
+    const list = input.list ?? [];
+    if (list.some((item) => !Number.isFinite(item))) {
+      return { ok: false, reason: `Expected a ${input.kind.slice(0, -2)}, but got something else` };
+    }
+    body = [...varint(list.length)];
+    for (const item of list) {
+      const buf = Buffer.alloc(input.kind === "float[]" ? 4 : 8);
+      if (input.kind === "float[]") buf.writeFloatLE(item);
+      else buf.writeDoubleLE(item);
+      body.push(...buf);
+    }
   } else if (input.kind === "int64[]" || input.kind === "uint64[]") {
     const items = input.kind === "int64[]" ? input.signeds ?? [] : input.uints ?? [];
     const pattern = input.kind === "int64[]" ? /^-?(0|[1-9][0-9]{0,18})$/ : /^(0|[1-9][0-9]{0,19})$/;
@@ -179,11 +209,11 @@ export function previewAttributeBytes(input: {
   return { ok: true, hex: Buffer.from([...ident, ...body]).toString("hex") };
 }
 
-const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "int16", "int32", "int64", "uint64", "ipfs", "float", "double", "uint8[]", "int64[]", "uint64[]", "string[]"]);
+const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "int16", "int32", "int64", "uint64", "ipfs", "float", "double", "uint8[]", "int8[]", "int16[]", "uint16[]", "uint32[]", "int64[]", "uint64[]", "float[]", "double[]", "string[]"]);
 
 export type BlobValue = {
   name: string;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "double" | "uint8[]" | "int64[]" | "uint64[]" | "string[]";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "int64" | "uint64" | "ipfs" | "float" | "double" | "uint8[]" | "int8[]" | "int16[]" | "uint16[]" | "uint32[]" | "int64[]" | "uint64[]" | "float[]" | "double[]" | "string[]";
   text?: string;
   number?: number;
   uint64?: string;

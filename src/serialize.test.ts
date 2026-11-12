@@ -19,10 +19,9 @@ describe("attribute bytes", () => {
       ok: true,
       hex: "040103",
     });
-    expect(previewAttributeBytes({ formatIndex: 0, kind: "uint64[]", uints: ["128"] })).toEqual({
-      ok: true,
-      hex: "04018001",
-    });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "int8[]", list: [-1] })).toEqual({ ok: true, hex: "040101" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "uint16[]", list: [65535] })).toEqual({ ok: true, hex: "0401ffff03" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "float[]", list: [1] })).toEqual({ ok: true, hex: "04010000803f" });
   });
 
   it("keeps the format index when earlier lines are omitted", () => {
