@@ -81,7 +81,7 @@ The contract check is `burnable || transferable`. Both false is refused with the
 
 `previewMint` refuses a missing schema, a missing template, a template from another schema, a reached max (`The template's maxsupply has already been reached` — one word), any id other than an existing template or `-1`, and any backed token (`Native backing has been deprecated on the AtomicAssets Contract`). An infinite max (`0`) does not hit the reached check. A successful mint of a real template returns `nextIssued` as current plus one. `-1` returns `nextIssued: null`.
 
-`previewCreateSchema` uses string length 1–12, not eosio name encoding. A taken name fails. `previewExtendSchema` must add at least one line. Format-string validity (`check_format`) is not reimplemented.
+`previewCreateSchema` uses string length 1–12, not eosio name encoding. A taken name fails. `previewExtendSchema` must add at least one line. `previewSchemaFormat` is the v2 `check_format` rule: a `name`/`string` line is required, names are unique and at most 64 characters, and a type is one scalar plus at most one `[]`. The header comment says `byte`. The code accepts `bytes` and rejects `byte`. Nested vectors fail.
 
 Collection authorization is not checked. A successful preview is not a transaction.
 
@@ -90,7 +90,7 @@ Pack opening and claim shapes are [wax-drops-and-pack-opening-experience](https:
 ## Masterclass — what the explorer does not do
 
 - It does not read `templates2`. Mutable template data is that table plus `settempldata`.
-- It does not serialize attributes. A passing mint preview can still fail `check_format` on chain.
+- Attribute bytes are still not serialized. `previewSchemaFormat` checks the type names only. A value that does not fit `uint8` is not caught here.
 - Transfer and burn of an already minted asset live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews).
 
 ### What this course will not teach

@@ -16,7 +16,7 @@
 > **Parent Catalog:** [wax-ecosystem-blueprint-catalog](https://github.com/pixel-journey/wax-ecosystem-blueprint-catalog)  
 > **Related Perfected Foundations:** [pixel-journey-standards](https://github.com/pixel-journey/pixel-journey-standards) · [pixel-journey-templates](https://github.com/pixel-journey/pixel-journey-templates) · [gitbook-docs](https://github.com/pixel-journey/gitbook-docs)
 
-**Goal:** Deliver a premium, educational, and production-oriented reference for exploring, validating, and understanding AtomicAssets templates, schemas, and their relationships on WAX.
+**Goal:** An educational reference for AtomicAssets templates, schemas, and how a mint is refused. The React explorer is not the tested part. `npm test` is.
 
 Templates and schemas are the data foundation of every Atomic collection. Misunderstanding them causes broken mint flows, painful migrations, and silent attribute bugs. This blueprint makes that foundation visible and checkable.
 
