@@ -6,29 +6,63 @@
  */
 
 function varint(number: number): number[] {
+  return varintBig(BigInt(number));
+}
+
+function varintBig(number: bigint): number[] {
   const bytes: number[] = [];
   let rest = number;
-  while (rest >= 128) {
-    bytes.push(128 + (rest % 128));
-    rest = Math.floor(rest / 128);
+  while (rest >= 128n) {
+    bytes.push(Number(128n + (rest % 128n)));
+    rest /= 128n;
   }
-  bytes.push(rest);
+  bytes.push(Number(rest));
   return bytes;
 }
 
-function zigzag(value: number): number {
-  return value < 0 ? (-1 * (value + 1)) * 2 + 1 : value * 2;
+const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+function decodeBase58(text: string): number[] | null {
+  let i = 0;
+  while (i < text.length && /\s/.test(text[i] ?? "")) i += 1;
+  let zeroes = 0;
+  while (text[i] === "1") {
+    zeroes += 1;
+    i += 1;
+  }
+  const body = text.slice(i).trimEnd();
+  if ([...body].some((ch) => !B58.includes(ch))) return null;
+  const size = Math.floor((body.length * 733) / 1000) + 1;
+  const b256 = new Array<number>(size).fill(0);
+  let length = 0;
+  for (const ch of body) {
+    let carry = B58.indexOf(ch);
+    let n = 0;
+    for (let at = b256.length - 1; (carry !== 0 || n < length) && at >= 0; at -= 1, n += 1) {
+      carry += 58 * (b256[at] ?? 0);
+      b256[at] = carry % 256;
+      carry = Math.floor(carry / 256);
+    }
+    length = n;
+  }
+  const start = size - length;
+  return [...new Array<number>(zeroes).fill(0), ...b256.slice(start)];
 }
 
 export type Bytes =
   | { ok: false; reason: string }
   | { ok: true; hex: string };
 
+function zigzag(value: number): number {
+  return value < 0 ? (-1 * (value + 1)) * 2 + 1 : value * 2;
+}
+
 export function previewAttributeBytes(input: {
   formatIndex: number;
-  kind: "string" | "image" | "bool" | "uint8" | "int8";
+  kind: "string" | "image" | "bool" | "uint8" | "int8" | "uint64" | "ipfs";
   text?: string;
   number?: number;
+  uint64?: string;
 }): Bytes {
   if (input.formatIndex < 0) return { ok: false, reason: "format index must be the schema line, starting at 0" };
   const ident = varint(input.formatIndex + 4);
@@ -46,22 +80,34 @@ export function previewAttributeBytes(input: {
       return { ok: false, reason: "Expected a uint8, but got something else" };
     }
     body = varint(input.number & 0xff);
-  } else {
+  } else if (input.kind === "int8") {
     if (input.number === undefined || input.number < -128 || input.number > 127) {
       return { ok: false, reason: "Expected a int8, but got something else" };
     }
     body = varint(zigzag(input.number) & 0xff);
+  } else if (input.kind === "uint64") {
+    if (!/^(0|[1-9][0-9]{0,19})$/.test(input.uint64 ?? "")) {
+      return { ok: false, reason: "Expected a uint64, but got something else" };
+    }
+    const value = BigInt(input.uint64 ?? "0");
+    if (value > 18446744073709551615n) return { ok: false, reason: "Expected a uint64, but got something else" };
+    body = varintBig(value);
+  } else {
+    const decoded = decodeBase58(input.text ?? "");
+    if (!decoded) return { ok: false, reason: "Error when decoding IPFS string" };
+    body = [...varint(decoded.length), ...decoded];
   }
   return { ok: true, hex: Buffer.from([...ident, ...body]).toString("hex") };
 }
 
-const PACKED = new Set(["string", "image", "bool", "uint8", "int8"]);
+const PACKED = new Set(["string", "image", "bool", "uint8", "int8", "uint64", "ipfs"]);
 
 export type BlobValue = {
   name: string;
-  kind: "string" | "image" | "bool" | "uint8" | "int8";
+  kind: "string" | "image" | "bool" | "uint8" | "int8" | "uint64" | "ipfs";
   text?: string;
   number?: number;
+  uint64?: string;
 };
 
 export function previewDataBlob(
@@ -76,13 +122,14 @@ export function previewDataBlob(
     if (!value) continue;
     used.add(line.name);
     if (!PACKED.has(line.type) || value.kind !== line.type) {
-      return { ok: false, reason: `this preview packs string, image, bool, uint8, and int8. ${line.type} is not packed here` };
+      return { ok: false, reason: `this preview packs string, image, bool, uint8, int8, uint64, and ipfs. ${line.type} is not packed here` };
     }
     const piece = previewAttributeBytes({
       formatIndex: byName.get(line.name)?.index ?? 0,
       kind: value.kind,
       text: value.text,
       number: value.number,
+      uint64: value.uint64,
     });
     if (!piece.ok) return piece;
     parts.push(Buffer.from(piece.hex, "hex"));

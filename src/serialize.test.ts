@@ -9,7 +9,10 @@ describe("attribute bytes", () => {
     });
     expect(previewAttributeBytes({ formatIndex: 1, kind: "bool", number: 1 })).toEqual({ ok: true, hex: "0501" });
     expect(previewAttributeBytes({ formatIndex: 0, kind: "uint8", number: 255 })).toEqual({ ok: true, hex: "04ff01" });
-    expect(previewAttributeBytes({ formatIndex: 0, kind: "int8", number: -1 })).toEqual({ ok: true, hex: "0401" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "uint64", uint64: "128" })).toEqual({ ok: true, hex: "048001" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "ipfs", text: "2" })).toEqual({ ok: true, hex: "040101" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "ipfs", text: "1" })).toEqual({ ok: true, hex: "040100" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "ipfs", text: "0" }).ok).toBe(false);
   });
 
   it("keeps the format index when earlier lines are omitted", () => {
