@@ -69,6 +69,8 @@ The contract check is `burnable || transferable`. Both false is refused with the
 
 `previewReduceMax` refuses 0 (`The new max supply can't be set to zero (infinite)`), a value below issued supply, and a value that is not strictly lower than a finite current max. An infinite max (`0`) can be lowered to any positive number at or above the issued count.
 
+`previewDisplayName` refuses a `name` string longer than 64. A missing name is allowed. `previewSetTemplateData` then either does nothing (no row and empty data), creates the mutable row, replaces it, or deletes it when the new map is empty. The immutable template stays. Collection auth is not checked, and `logsetdatatl` is not sent. Deposit and withdraw of old balances live in [wax-nft-backed-token-unlock-visualizer](https://github.com/pixel-journey/wax-nft-backed-token-unlock-visualizer).
+
 ---
 
 ## Who this is for
