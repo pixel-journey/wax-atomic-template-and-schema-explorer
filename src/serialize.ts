@@ -59,7 +59,11 @@ function zigzag(value: number): number {
 
 export function previewAttributeBytes(input: {
   formatIndex: number;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "uint64" | "ipfs" | "float";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "uint64" | "ipfs" | "float" | "uint8[]";
+  text?: string;
+  number?: number;
+  uint64?: string;
+  list?: number[];
   text?: string;
   number?: number;
   uint64?: string;
@@ -92,6 +96,15 @@ export function previewAttributeBytes(input: {
       return { ok: false, reason: "Expected a int8, but got something else" };
     }
     body = varint(zigzag(input.number) & 0xff);
+  } else if (input.kind === "int16" || input.kind === "int32") {
+    const min = input.kind === "int16" ? -32768 : -2147483648;
+    const max = input.kind === "int16" ? 32767 : 2147483647;
+    if (input.number === undefined || input.number < min || input.number > max || !Number.isInteger(input.number)) {
+      return { ok: false, reason: `Expected a ${input.kind}, but got something else` };
+    }
+    const bits = input.kind === "int16" ? 16 : 32;
+    const zigzagged = input.number < 0 ? BigInt(-1 * (input.number + 1)) * 2n + 1n : BigInt(input.number) * 2n;
+    body = varintBig(zigzagged & ((1n << BigInt(bits)) - 1n));
   } else if (input.kind === "uint64") {
     if (!/^(0|[1-9][0-9]{0,19})$/.test(input.uint64 ?? "")) {
       return { ok: false, reason: "Expected a uint64, but got something else" };
@@ -106,6 +119,13 @@ export function previewAttributeBytes(input: {
     const buf = Buffer.alloc(4);
     buf.writeFloatLE(input.number);
     body = [...buf];
+  } else if (input.kind === "uint8[]") {
+    const list = input.list ?? [];
+    if (list.some((item) => !Number.isInteger(item) || item < 0 || item > 255)) {
+      return { ok: false, reason: "Expected a uint8, but got something else" };
+    }
+    body = [...varint(list.length)];
+    for (const item of list) body.push(...varint(item & 0xff));
   } else {
     const decoded = decodeBase58(input.text ?? "");
     if (!decoded) return { ok: false, reason: "Error when decoding IPFS string" };
@@ -114,14 +134,15 @@ export function previewAttributeBytes(input: {
   return { ok: true, hex: Buffer.from([...ident, ...body]).toString("hex") };
 }
 
-const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "uint64", "ipfs", "float"]);
+const PACKED = new Set(["string", "image", "bool", "uint8", "uint16", "uint32", "int8", "int16", "int32", "uint64", "ipfs", "float", "uint8[]"]);
 
 export type BlobValue = {
   name: string;
-  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "uint64" | "ipfs" | "float";
+  kind: "string" | "image" | "bool" | "uint8" | "uint16" | "uint32" | "int8" | "int16" | "int32" | "uint64" | "ipfs" | "float" | "uint8[]";
   text?: string;
   number?: number;
   uint64?: string;
+  list?: number[];
 };
 
 export function previewDataBlob(
@@ -144,6 +165,7 @@ export function previewDataBlob(
       text: value.text,
       number: value.number,
       uint64: value.uint64,
+      list: value.list,
     });
     if (!piece.ok) return piece;
     parts.push(Buffer.from(piece.hex, "hex"));

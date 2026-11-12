@@ -13,7 +13,11 @@ describe("attribute bytes", () => {
     expect(previewAttributeBytes({ formatIndex: 0, kind: "ipfs", text: "2" })).toEqual({ ok: true, hex: "040101" });
     expect(previewAttributeBytes({ formatIndex: 0, kind: "ipfs", text: "1" })).toEqual({ ok: true, hex: "040100" });
     expect(previewAttributeBytes({ formatIndex: 0, kind: "uint16", number: 65535 })).toEqual({ ok: true, hex: "04ffff03" });
-    expect(previewAttributeBytes({ formatIndex: 0, kind: "float", number: 1 })).toEqual({ ok: true, hex: "040000803f" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "int16", number: -2 })).toEqual({ ok: true, hex: "0403" });
+    expect(previewAttributeBytes({ formatIndex: 0, kind: "uint8[]", list: [1, 255] })).toEqual({
+      ok: true,
+      hex: "040201ff01",
+    });
   });
 
   it("keeps the format index when earlier lines are omitted", () => {
