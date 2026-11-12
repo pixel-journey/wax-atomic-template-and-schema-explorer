@@ -68,7 +68,18 @@ The contract check is `burnable || transferable`. Both false is refused with the
 - It does not read `templates2`. Mutable template data is that table plus `settempldata`. The README's "immutable vs mutable" line is the product idea. The table names are the contract idea.
 - It does not lower `max_supply` (`redtemplmax`) or remove an empty template (`deltemplate`). Those are listed in [V2-NOTES.md](./V2-NOTES.md) and not previewed here yet.
 - It does not mint. Minting is [wax-drops-and-pack-opening-experience](https://github.com/pixel-journey/wax-drops-and-pack-opening-experience) for pack flows and the WAX [mint guide](https://docs.wax.io/build/tutorials/howto_atomicassets/mint_nft) for the action shape.
+- Transfer and burn of an already minted asset live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews) (`previewTransfer`, `previewBurn`). This course stops at the template row.
 - Native backing is deprecated. `backasset` fails in the v2 cpp. Holder splits are `equalSplit` and `duePayout` in [wax-nft-backed-token-unlock-visualizer](https://github.com/pixel-journey/wax-nft-backed-token-unlock-visualizer).
+
+## Supply — delete, lock, reduce
+
+`previewDeleteTemplate` succeeds only when `issuedSupply` is 0. The contract string is `Can't delete a template that has any assets issued`.
+
+`previewLockTemplate` sets `maxSupply` to `issuedSupply`. A negative id returns `The template id must be positive`. Zero issued returns `Can't lock a template that does not have at least one issued asset`.
+
+`previewReduceMax` refuses 0 (`The new max supply can't be set to zero (infinite)`), a value below issued supply, and a value that is not strictly lower than a finite current max. An infinite max (`0`) can be lowered to any positive number at or above the issued count.
+
+Collection authorization is not checked. A successful preview is not a transaction.
 
 ### What this course will not teach
 

@@ -1,6 +1,6 @@
 # wax-atomic-template-and-schema-explorer
 
-> **Home for schema and template rules.** `setschematyp` replaces the whole descriptor array. A template cannot be both non-transferable and non-burnable. `tokens_to_back` is rejected. The course is [EDUCATION.md](./EDUCATION.md). Related rules live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews) (author, RAM, offers) and [wax-atomic-collection-config-visualizer](https://github.com/pixel-journey/wax-atomic-collection-config-visualizer) (fee, auth lists). Do not open a new micro-repo for a single check that belongs here.
+> **Home for schema and template rules.** `setschematyp` replaces the whole descriptor array. A template cannot be both non-transferable and non-burnable. `deltemplate` needs zero issued. `locktemplate` sets max to issued. `redtemplmax` only lowers. `tokens_to_back` is rejected. The course is [EDUCATION.md](./EDUCATION.md). Transfer and burn of a minted asset live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews). Collection fee and auth lists live in [wax-atomic-collection-config-visualizer](https://github.com/pixel-journey/wax-atomic-collection-config-visualizer). Do not open a new micro-repo for a single check that belongs here.
 
 **Official sources, still live:**
 - [How-To AtomicAssets](https://docs.wax.io/build/tutorials/howto_atomicassets)
