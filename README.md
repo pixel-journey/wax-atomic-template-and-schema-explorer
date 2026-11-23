@@ -11,10 +11,9 @@
 > **Trust Label:** `educational-reference`  
 > **Verification:** The pure functions in `src/schemaRules.ts` are tested (`npm test`). The React explorer is not. See [VERIFICATION-LOG.md](VERIFICATION-LOG.md).
 
-> **Status:** 🔄 Deep Refinement in Progress (PX Perfection Standard)  
-> **Category:** Atomic Ecosystem – Templates, Schemas & Collection Data Models  
-> **Parent Catalog:** [wax-ecosystem-blueprint-catalog](https://github.com/pixel-journey/wax-ecosystem-blueprint-catalog)  
-> **Related Perfected Foundations:** [pixel-journey-standards](https://github.com/pixel-journey/pixel-journey-standards) · [pixel-journey-templates](https://github.com/pixel-journey/pixel-journey-templates) · [gitbook-docs](https://github.com/pixel-journey/gitbook-docs)
+The rules below were read from [atomicassets-contract v2.0.0](https://github.com/atomicassets/atomicassets-contract/releases/tag/v2.0.0). On WAX the account is `atomicassets`. Another Antelope chain can deploy the same contract under a different account. This lab does not look that account up, and it does not call `orng.wax`.
+
+Standards: [pixel-journey-standards](https://github.com/pixel-journey/pixel-journey-standards). The private catalog is not linked from this public page.
 
 **Goal:** An educational reference for AtomicAssets templates, schemas, and how a mint is refused. The React explorer is not the tested part. `npm test` is.
 
@@ -165,7 +164,7 @@ Companion to:
 - `wax-blends-creator-and-visualizer`
 - `wax-advanced-drop-mechanics-toolkit`
 
-Foundational layer: `pixel-journey-standards`, `pixel-journey-templates`, `gitbook-docs`, `wax-ecosystem-blueprint-catalog`.
+Foundational layer: [pixel-journey-standards](https://github.com/pixel-journey/pixel-journey-standards).
 
 ---
 
@@ -173,8 +172,6 @@ Foundational layer: `pixel-journey-standards`, `pixel-journey-templates`, `gitbo
 
 MIT License
 
-**Pixel Journey** — Educational, practical, and beautiful interfaces for public blockchain infrastructure.
+**Pixel Journey** — Educational interfaces for public blockchain infrastructure.
 
-*Exemplifies the [PX Perfection Standard](https://github.com/pixel-journey/wax-ecosystem-blueprint-catalog/blob/main/PX-PERFECTION-STANDARD.md).*
-
-*Last major refinement pass: October 2026*
+*Last refinement noted here: November 2026.*

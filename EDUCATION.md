@@ -8,7 +8,8 @@ Official reading, still live:
 - [Managing AA Templates](https://docs.wax.io/build/tutorials/howto_atomicassets/templates_js)
 - [Minting atomicassets NFTs](https://docs.wax.io/build/tutorials/howto_atomicassets/mint_nft)
 - [atomicassets-contract v2.0.0](https://github.com/atomicassets/atomicassets-contract/releases/tag/v2.0.0) — the source these previews were read from
-- [ATOMICASSETS-V2.md](https://github.com/pixel-journey/wax-ecosystem-blueprint-catalog/blob/main/ATOMICASSETS-V2.md) in the catalog
+
+On WAX the contract account is `atomicassets`. The same source can be deployed on another Antelope chain under a different account. These tests do not query that account. `orng.wax` is a WAX randomness contract, not a schema action, and it is not called here.
 
 This is the home for schema and template rules. Author succession, RAM payer, and offer shape live in [wax-atomicassets-v2-action-previews](https://github.com/pixel-journey/wax-atomicassets-v2-action-previews). Collection fee and auth lists live in [wax-atomic-collection-config-visualizer](https://github.com/pixel-journey/wax-atomic-collection-config-visualizer). Do not open a new micro-repo for a single check that belongs here.
 
