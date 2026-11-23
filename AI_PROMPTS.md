@@ -1,28 +1,36 @@
-# AI_PROMPTS.md — Atomic Template & Schema Explorer
+# AI handoff — Atomic template and schema explorer
 
-## 1. Validate a payload
+## Agent tooling
 
-```
-Using validateAgainstSchema from this repo, check this attribute object
-against [SCHEMA]. List per-field failures with human-readable messages.
-Do not invent format types.
-```
-
-## 2. Extend known formats carefully
-
-```
-Propose adding format "[NAME]" to KNOWN_FORMATS only if it is documented
-for AtomicAssets. Update describeFormat and validateAttributeValue.
-If the format is not standard, recommend documenting it as custom instead.
+```bash
+git clone https://github.com/wharfkit/skill.git ~/.claude/skills/wharfkit
+# https://github.com/atomicassets/atomic-knowledge — pin commit, AGENTS.md
 ```
 
-## 3. Wire live API
+| Source | Role |
+| --- | --- |
+| [Serialization wiki](https://github.com/pinknetworkx/atomicassets-contract/wiki/Serialization) | Kind encodings |
+| [atomicassets-sdk](https://github.com/atomicassets/atomicassets-sdk) | Official TS path |
+| [mutable primitives](https://github.com/pixel-journey/px-aa-mutable-all-primitive-types) | Kind mismatch non-mutating |
+| [atomic-knowledge](https://github.com/atomicassets/atomic-knowledge) | Network before action |
 
-```
-Add a read-only loader for schemas/templates from the AtomicAssets API
-for collection [NAME]. Keep explorer read-only; handle not-found calmly.
-```
+## Non-negotiables
 
----
+1. `validateAgainstSchema` — list per-field failures; **do not invent format types**.
+2. Propose new `KNOWN_FORMATS` only if documented for AtomicAssets; otherwise mark custom.
+3. Explorer stays **read-only** for live API loaders; handle not-found calmly.
+4. Schema/template field lists are chain/ABI-local; validation pattern ports.
+5. Pair with collection config and mutable stack — do not open a micro-repo for one format string.
 
-*Pixel Journey AI collaboration toolkit.*
+## Prompt seeds
+
+- "Using validateAgainstSchema, check this attribute object against [SCHEMA]."
+- "Propose format [NAME] only if Atomic-documented; else custom."
+- "Add read-only loader for schemas/templates of collection [NAME]."
+- "Hand kind mismatch to mutable primitives lab."
+
+## Do not
+
+- Invent format types.
+- Write setassetdata from this explorer alone (mutable stack owns full-map rules).
+- Claim live schema was mutated.
